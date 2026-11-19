@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国矿山安全学会矿鸿联盟工作委员会委员选举</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+            background: #f5f6fa;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 标题 */
+        .header {
+            text-align: center;
+            padding: 25px 20px;
+            background: linear-gradient(135deg, #1a5276 0%, #2980b9 100%);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 1.6em;
+            line-height: 1.4;
+        }
+
+        /* 管理端按钮 - 灰色小按钮，放右边 */
+        .admin-bar {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+
+        .admin-btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #bdc3c7;
+            color: #555;
+        }
+        .admin-btn:hover {
+            background: #95a5a6;
+            color: white;
+        }
+
+        /* 投票列表 - 紧凑布局 */
+        .vote-list {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .vote-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.15s;
+            cursor: pointer;
+        }
+
+        .vote-item:last-child { border-bottom: none; }
+        .vote-item:hover { background: #f8f9fa; }
+
+        .vote-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #2980b9;
+            flex-shrink: 0;
+        }
+
+        .vote-info {
+            flex: 1;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .vote-name {
+            font-size: 0.95em;
+            font-weight: bold;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        .vote-unit {
+            font-size: 0.8em;
+            color: #999;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        /* 提交按钮区域 */
+        .submit-area {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .btn-submit {
+            padding: 14px 50px;
+            font-size: 1.1em;
+            background: linear-gradient(135deg, #2980b9 0%, #1a5276 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(41, 128, 185, 0.3);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            background: #27ae60;
+        }
+
+        .submit-hint {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        /* 弹窗 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal h2 {
+            margin-bottom: 15px;
+            color: #333;
+            text-align: center;
+            font-size: 1.3em;
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 1.4em;
+            cursor: pointer;
+            color: #999;
+            background: none;
+            border: none;
+        }
+        .modal-close:hover { color: #333; }
+
+        /* 二维码 */
+        .qr-container {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .qr-container img {
+            max-width: 250px;
+            width: 100%;
+            border: 2px solid #eee;
+            border-radius: 10px;
+        }
+
+        .qr-hint {
+            margin-top: 12px;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        /* 结果统计 */
+        .result-stats {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .result-stats .stat {
+            display: inline-block;
+            margin: 0 12px;
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .result-stats .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2980b9;
+        }
+
+        .result-stats .stat-label {
+            font-size: 0.8em;
+            color: #888;
+        }
+
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .result-table th,
+        .result-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em;
+        }
+
+        .result-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .bar-container {
+            width: 100%;
+            height: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2980b9 0%, #3498db 100%);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .bar-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.75em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* 确认弹窗 */
+        .confirm-modal {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .confirm-modal p {
+            margin-bottom: 15px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .confirm-modal .warn {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-confirm-yes {
+            padding: 10px 30px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-confirm-no {
+            padding: 10px 30px;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.3em; }
+            .vote-item { padding: 6px 12px; }
+            .vote-name { font-size: 0.9em; }
+            .vote-unit { font-size: 0.75em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 标题 -->
+        <div class="header">
+            <h1>🗳️ 中国矿山安全学会<br>矿鸿联盟工作委员会委员选举</h1>
+        </div>
+
+        <!-- 管理端按钮 - 灰色小按钮，靠右 -->
+        <div class="admin-bar">
+            <button class="admin-btn" onclick="showQRModal()">📱 二维码</button>
+            <button class="admin-btn" onclick="showResultModal()">📊 结果</button>
+        </div>
+
+        <!-- 投票列表 -->
+        <div class="vote-list" id="voteList"></div>
+
+        <!-- 提交按钮 -->
+        <div class="submit-area">
+            <button class="btn-submit" id="submitBtn" onclick="handleSubmitClick()">✅ 提交选票</button>
+            <p class="submit-hint" id="submitHint">默认已全选，如需取消请点选对应选项</p>
+        </div>
+    </div>
+
+    <!-- 二维码弹窗 -->
+    <div class="modal-overlay" id="qrModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeQRModal()">×</button>
+            <h2>📱 投票二维码</h2>
+            <div class="qr-container">
+                <img id="qrImage" src="" alt="投票二维码">
+                <p class="qr-hint">用微信或其他扫码工具扫描上方二维码即可投票</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结果弹窗 -->
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeResultModal()">×</button>
+            <h2>📊 投票结果</h2>
+            <div class="result-stats" id="resultStats"></div>
+            <table class="result-table">
+                <thead>
+                    <tr>
+                        <th style="width:40px;">排名</th>
+                        <th style="width:90px;">姓名</th>
+                        <th style="width:50px;">票数</th>
+                        <th>支持率</th>
+                    </tr>
+                </thead>
+                <tbody id="resultBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 非全选确认弹窗 -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal confirm-modal">
+            <h2>⚠️ 确认提醒</h2>
+            <p id="confirmText"></p>
+            <div class="confirm-buttons">
+                <button class="btn-confirm-no" onclick="closeConfirmModal()">返回修改</button>
+                <button class="btn-confirm-yes" onclick="forceSubmitVote()">确认提交</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 候选人数据（77人） ====================
+        const candidates = [
+            { name: '安郁熙', unit: '华夏天信智能物联股份有限公司产品中心总监' },
+            { name: '安月阳', unit: '北京安瑞斯矿山装备有限公司总经理' },
+            { name: '包建军', unit: '中煤科工集团常州研究院有限公司总工程师' },
+            { name: '曹安业', unit: '中国矿业大学计算机科学与技术学院/人工智能学院教授' },
+            { name: '常圣强', unit: '中煤装备研发主管' },
+            { name: '陈国辉', unit: '南京双京电器集团有限公司董事长' },
+            { name: '陈海峰', unit: '鄂尔多斯市数投工业互联网有限公司总经理' },
+            { name: '陈华州', unit: '北京龙软科技股份有限公司副总工程师' },
+            { name: '陈朋朋', unit: '中国矿业大学计算机科学与技术学院/人工智能学院副院长' },
+            { name: '陈瑞强', unit: '山西人工智能矿山创新实验室有限公司董事长' },
+            { name: '陈小俊', unit: '鸿宁智联（南京）检测认证科技有限公司矿鸿负责人' },
+            { name: '陈智宇', unit: '华为终端三方使能产品线行业鸿蒙生态总经理' },
+            { name: '崔科飞', unit: '郑州恒达智控科技股份有限公司总经理助理' },
+            { name: '窦涛', unit: '四川航天电液控制有限公司副总经理、研发中心主任' },
+            { name: '段威', unit: '鸿湖万联（江苏）科技发展有限公司矿鸿事业部总经理' },
+            { name: '范素芳', unit: '山西际安电气有限公司董事长' },
+            { name: '顾荣强', unit: '华为矿山军团解决方案总监' },
+            { name: '韩雷', unit: '华为矿山军团高级产品经理' },
+            { name: '郝志伟', unit: '山西焦煤集团信息化管理部（大数据中心）部长' },
+            { name: '何龙', unit: '南京弘毅电气自动化有限公司研发主任' },
+            { name: '惠博', unit: '鸿湖万联（江苏）科技发展有限公司矿鸿事业部主任工程师' },
+            { name: '冀虎', unit: '矿冶科技集团矿山工程设计研究所主任/正高级工程师' },
+            { name: '景杰', unit: '上海山源电子科技股份有限公司董事长' },
+            { name: '李刚', unit: '辽宁工程技术大学科学技术研究院院长' },
+            { name: '李震', unit: '山东中道消防设备有限公司总经理' },
+            { name: '连维瑞', unit: '淮南万泰电子股份有限公司总经理' },
+            { name: '梁沫', unit: '中煤科工集团北京华宇工程有限公司西北设计研究院副院长' },
+            { name: '林恩强', unit: '北京天玛智控科技股份有限公司高级技术专家' },
+            { name: '林江', unit: '上海创力集团股份有限公司研发副总经理' },
+            { name: '刘波', unit: '云鼎科技股份有限公司董事长、总经理' },
+            { name: '刘航', unit: '重庆梅安森科技股份有限公司董事、技术总工、研发部总经理' },
+            { name: '刘建文', unit: '厦门贝启科技有限公司总经理' },
+            { name: '刘克娜', unit: '龙宇天下（北京）文化传媒有限公司董事长' },
+            { name: '刘文韬', unit: '山东万腾数字科技有限公司副总裁' },
+            { name: '刘毅', unit: '中国矿业大学（北京）信息工程研究所所长' },
+            { name: '马开德', unit: '中煤装备研发主管' },
+            { name: '马宁博', unit: '鄂尔多斯市数投工业互联网有限公司技术部部长' },
+            { name: '孟磊', unit: '诚迈科技股份有限公司联席总裁' },
+            { name: '孟祥军', unit: '山东能源集团原首席技术专家' },
+            { name: '孟亚光', unit: '上海山源电子科技股份有限公司中央研究院副院长' },
+            { name: '欧阳龙水', unit: '中安华邦（北京）安全生产技术研究院研究部总监' },
+            { name: '潘伟', unit: '山东黄金矿业（莱州）有限公司三山岛金矿建设部经理' },
+            { name: '蒲军', unit: '江苏润开鸿数字科技有限公司能源矿山行业总监' },
+            { name: '谌晓欢', unit: '江西铜业集团数智化部板块经理' },
+            { name: '舒应秋', unit: '华能蒙东伊敏煤电公司副总经理兼伊敏露天矿矿长' },
+            { name: '宋冰清', unit: '中煤装备研发主管' },
+            { name: '孙鹏亮', unit: '中煤装备研究院副院长' },
+            { name: '王安义', unit: '西安科技大学通信学院院长' },
+            { name: '王东君', unit: 'MARCO（北京）自动控制系统开发有限公司董事长' },
+            { name: '王华东', unit: '山东海纳智能装备科技股份有限公司研发中心主任' },
+            { name: '王剑', unit: '广州金其利信息科技有限公司副总裁兼技术总监' },
+            { name: '吴海宇', unit: '华为矿山军团总裁' },
+            { name: '吴劲松', unit: '安徽理工大学（煤炭无人化开采数智技术全国重点实验室）教授' },
+            { name: '谢旭阳', unit: '北京科技大学安全技术及工程学院教授' },
+            { name: '谢阳', unit: '常州联力自动化科技有限公司软件主管' },
+            { name: '辛凤阳', unit: '中煤科工集团沈阳设计研究院有限公司数字技术研发部主任' },
+            { name: '徐辉', unit: '内蒙古智能煤炭有限责任公司党委书记、董事长' },
+            { name: '徐驿凡', unit: '中煤装备研发主管' },
+            { name: '许芝光', unit: '山东鑫智机器人有限公司总经理' },
+            { name: '薛凯', unit: '保定飞凌嵌入式技术有限公司生态总监' },
+            { name: '薛卫平', unit: '西安鸿钧经纬科技有限公司总经理' },
+            { name: '杨大明', unit: '安标国家中心原副主任、中国矿山安全学会常务理事' },
+            { name: '杨康平', unit: '四川省自然资源投资集团智能装备制造公司总经理' },
+            { name: '杨霖', unit: '华为终端三方使能产品线总经理' },
+            { name: '杨文嘉', unit: '浙江辰泰智能装备有限公司技术负责人' },
+            { name: '杨旭', unit: '中国矿业大学计算机科学与技术学院/人工智能学院教授' },
+            { name: '叶良东', unit: '浙江志展智能科技有限公司董事长' },
+            { name: '应科', unit: '江西铜锐信息技术有限公司副总经理' },
+            { name: '袁智', unit: '中国中煤集团装备事业部副总经理、装备公司总工程师' },
+            { name: '张广超', unit: '山东科技大学能源与矿业工程学院教授' },
+            { name: '张衡', unit: '鄂尔多斯市腾远煤炭有限责任公司总经理' },
+            { name: '张万军', unit: '甘肃泽德电子技术有限公司总经理' },
+            { name: '赵家骅', unit: '南京北路智控科技股份有限公司副总经理' },
+            { name: '赵艳伟', unit: '华为矿山军团产业发展总监' },
+            { name: '周军', unit: '浙江恒云智联数字科技有限公司总经理' },
+            { name: '朱凯', unit: '山东海纳智能装备科技股份有限公司董事长' },
+            { name: '邹文', unit: '四川里伍铜业股份有限公司公司党委委员、中咀铜矿党支书记' }
+        ];
+
+        const TOTAL = candidates.length;
+
+        // ==================== 渲染投票列表 ====================
+        function renderVoteList() {
+            const listEl = document.getElementById('voteList');
+            listEl.innerHTML = candidates.map((c, i) => `
+                <label class="vote-item">
+                    <input type="checkbox" id="cb_${i}" checked data-index="${i}">
+                    <span class="vote-info">
+                        <span class="vote-name">${i + 1}. ${c.name}</span>
+                        <span class="vote-unit">${c.unit}</span>
+                    </span>
+                </label>
+            `).join('');
+        }
+
+        // ==================== 提交逻辑 ====================
+        function handleSubmitClick() {
+            const checkboxes = document.querySelectorAll('.vote-item input[type="checkbox"]');
+            let selectedCount = 0;
+            checkboxes.forEach(cb => { if (cb.checked) selectedCount++; });
+
+            if (selectedCount === 0) {
+                alert('请至少选择一位候选人');
+                return;
+            }
+
+            // 如果不是全选，弹出确认
+            if (selectedCount < TOTAL) {
+                showConfirmModal(selectedCount);
+            } else {
+                doSubmit();
+            }
+        }
+
+        function showConfirmModal(selectedCount) {
+            const unchecked = TOTAL - selectedCount;
+            document.getElementById('confirmText').innerHTML = 
+                `您已取消 <span class="warn">${unchecked}</span> 位候选人的勾选<br>` +
+                `当前仅选择 <span class="warn">${selectedCount}</span> / ${TOTAL} 人<br><br>` +
+                `请确认是否以此状态提交？`;
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+        }
+
+        function forceSubmitVote() {
+            closeConfirmModal();
+            doSubmit();
+        }
+
+        function doSubmit() {
+            const checkboxes = document.querySelectorAll('.vote-item input[type="checkbox"]');
+            const selected = [];
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    selected.push(candidates[parseInt(cb.dataset.index)].name);
+                }
+            });
+
+            // 保存到 localStorage
+            const votes = JSON.parse(localStorage.getItem('votes') || '[]');
+            votes.push({
+                time: new Date().toISOString(),
+                selected: selected
+            });
+            localStorage.setItem('votes', JSON.stringify(votes));
+
+            // 更新按钮为提示语
+            const btn = document.getElementById('submitBtn');
+            btn.textContent = '✅ 投票已提交，感谢您的参与！';
+            btn.disabled = true;
+            document.getElementById('submitHint').textContent = '';
+
+            // 禁用所有复选框
+            checkboxes.forEach(cb => cb.disabled = true);
+        }
+
+        // ==================== 二维码弹窗 ====================
+        function showQRModal() {
+            const url = window.location.href;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+            document.getElementById('qrImage').src = qrUrl;
+            document.getElementById('qrModal').classList.add('active');
+        }
+
+        function closeQRModal() {
+            document.getElementById('qrModal').classList.remove('active');
+        }
+
+        // ==================== 结果弹窗 ====================
+        function showResultModal() {
+            const votes = JSON.parse(localStorage.getItem('votes') || '[]');
+            const totalVotes = votes.length;
+
+            const countMap = {};
+            candidates.forEach(c => countMap[c.name] = 0);
+            votes.forEach(v => v.selected.forEach(name => {
+                if (countMap[name] !== undefined) countMap[name]++;
+            }));
+
+            const sorted = Object.entries(countMap).sort((a, b) => b[1] - a[1]);
+
+            document.getElementById('resultStats').innerHTML = `
+                <div class="stat">
+                    <div class="stat-value">${totalVotes}</div>
+                    <div class="stat-label">总投票人数</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">${candidates.length}</div>
+                    <div class="stat-label">候选人总数</div>
+                </div>
+            `;
+
+            document.getElementById('resultBody').innerHTML = sorted.map(([name, cnt], i) => {
+                const pct = totalVotes > 0 ? ((cnt / totalVotes) * 100).toFixed(1) : '0.0';
+                const barWidth = totalVotes > 0 ? (cnt / totalVotes) * 100 : 0;
+                return `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td><strong>${name}</strong></td>
+                        <td>${cnt}</td>
+                        <td>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width:${barWidth}%"></div>
+                                <span class="bar-text">${pct}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('resultModal').classList.add('active');
+        }
+
+        function closeResultModal() {
+            document.getElementById('resultModal').classList.remove('active');
+        }
+
+        // ==================== 初始化 ====================
+        renderVoteList();
+    </script>
+</body>
+</html>
